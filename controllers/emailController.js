@@ -12,10 +12,6 @@ const sendEmail = async (req, res) => {
 
     const { name, surname, email, phoneNumber, message } = req.body;
 
-    if (!name || !email || !message) {
-        return res.status(400).json({ error: "Compila tutti i campi" });
-    }
-
     try {
         // Contenuto dell'email
         const mailOptions = {
@@ -30,12 +26,13 @@ const sendEmail = async (req, res) => {
 
         res.json({
             success: true,
-            message: "Email inviata con successo"
+            message: "Email inviata con successo!"
         });
     } catch (error) {
         console.error(error);
         res.status(500).json({
             success: false,
+            type: "generic",
             message: `Errore nell'invio ${error}`
         });
     };
