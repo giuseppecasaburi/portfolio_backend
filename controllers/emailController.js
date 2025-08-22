@@ -40,7 +40,7 @@ const sendEmail = async (req, res) => {
             Messaggio: ${message}
             Consenso Privacy: ${policy ? 'SI' : 'NO'} in data ${new Date().toLocaleString()}
 ==============================================================\n`
-        ;
+            ;
 
         // Percorso del file .txt dove salvare i dati
         const filePath = path.join(__dirname, 'contatti.txt');
@@ -65,4 +65,29 @@ const sendEmail = async (req, res) => {
     }
 };
 
-export default sendEmail;
+const readLog = (req, res) => {
+    const logPath = path.join(__dirname, 'contatti.txt');
+
+    try {
+        if (fs.existsSync(logPath)) {
+            const data = fs.readFileSync(logPath, 'utf8')
+            res.json({
+                success: true,
+                logs: data,
+                message: 'File trovato'
+            })
+        } else {
+            res.json({
+                success: false,
+                message: 'File non trovato (probabilmente cancellato dal restart)'
+            })
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            error: error.message
+        })
+    }
+}
+
+export {sendEmail, readLog};
