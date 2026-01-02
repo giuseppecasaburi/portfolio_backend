@@ -15,7 +15,7 @@ const sendEmail = async (req, res) => {
         // console.log('Tentativo invio email...');
 
         const { data, error } = await resend.emails.send({
-            from: process.env.EMAIL_USER,
+            from: "onboarding@resend.dev",
             to: process.env.EMAIL_USER,
             replyTo: email,
             subject: `Messaggio da ${name} ${surname ? surname : ''} - Portfolio`,
