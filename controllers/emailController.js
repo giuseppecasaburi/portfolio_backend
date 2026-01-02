@@ -1,47 +1,39 @@
 import { Resend } from 'resend';
-import fs from 'fs';
-import path from 'path';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const sendEmail = async (req, res) => {
     const { name, surname, email, phoneNumber, message, policy } = req.body;
 
     try {
         const resend = new Resend(process.env.RESEND_API_KEY);
-        // console.log('Tentativo invio email...');
+        const dataOra = new Date().toLocaleString('it-IT');
 
         const { data, error } = await resend.emails.send({
             from: "onboarding@resend.dev",
             to: process.env.EMAIL_USER,
             replyTo: email,
-            subject: `Messaggio da ${name} ${surname ? surname : ''} - Portfolio`,
-            text: `${message}\n\n\nDa: ${name} ${surname ? surname : "Cognome non inserito"}\nEmail: ${email}\nTelefono: ${phoneNumber ? phoneNumber : "Numero non inserito"}`,
+            subject: `Messaggio da ${name} ${surname || ''} - Portfolio`,
+            text: `NUOVO MESSAGGIO DAL PORTFOLIO
+
+                MESSAGGIO:
+                ${message}
+
+                DATI CONTATTO:
+                Nome: ${name}
+                Cognome: ${surname || 'Non inserito'}
+                Email: ${email}
+                Telefono: ${phoneNumber || 'Non inserito'}
+
+                CONSENSO PRIVACY:
+                L'utente ha ${policy ? 'ACCETTATO' : 'RIFIUTATO'} il trattamento dei dati personali
+                Data e ora del consenso: ${dataOra}
+
+                ---
+                Questa email è stata generata automaticamente dal form di contatto del portfolio.`,
         });
 
         if (error) {
             throw new Error(error.message);
         }
-
-        // console.log('Email inviata con successo! ID:', data.id);
-
-        // Salvataggio dati nel Log (identico a prima)
-        const dataToSave = `\n===== Nuovo invio (${new Date().toLocaleString()}) =====
-            Nome: ${name}
-            Cognome: ${surname || 'Non inserito'}
-            Email: ${email}
-            Telefono: ${phoneNumber || 'Non inserito'}
-            Messaggio: ${message}
-            Consenso Privacy: ${policy ? 'SI' : 'NO'} in data ${new Date().toLocaleString()}
-==============================================================\n`;
-
-        const filePath = path.join(__dirname, 'contatti.txt');
-        await fs.promises.appendFile(filePath, dataToSave);
-
-        // console.log('Dati salvati con successo!');
 
         res.json({
             success: true,
@@ -49,8 +41,6 @@ const sendEmail = async (req, res) => {
         });
 
     } catch (error) {
-
-        // console.error('Errore:', error);
         res.status(500).json({
             success: false,
             type: "generic",
@@ -59,29 +49,4 @@ const sendEmail = async (req, res) => {
     }
 };
 
-const readLog = (req, res) => {
-    const logPath = path.join(__dirname, 'contatti.txt');
-
-    try {
-        if (fs.existsSync(logPath)) {
-            const data = fs.readFileSync(logPath, 'utf8')
-            res.json({
-                success: true,
-                logs: data,
-                message: 'File trovato'
-            })
-        } else {
-            res.json({
-                success: false,
-                message: 'File non trovato (probabilmente cancellato dal restart)'
-            })
-        }
-    } catch (error) {
-        res.json({
-            success: false,
-            error: error.message
-        })
-    }
-}
-
-export { sendEmail, readLog };
+export { sendEmail };
