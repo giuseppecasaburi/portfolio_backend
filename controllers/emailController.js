@@ -15,11 +15,16 @@ const sendEmail = async (req, res) => {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
         },
+        debug: true, // abilita debug dettagliato
+        logger: true // abilita logging
     });
 
     const { name, surname, email, phoneNumber, message, policy } = req.body;
 
     try {
+
+        console.log('Tentativo invio email...');
+
         // Contenuto dell'email
         const mailOptions = {
             from: process.env.EMAIL_USER,
@@ -56,6 +61,12 @@ const sendEmail = async (req, res) => {
         });
 
     } catch (error) {
+
+        console.error('=== ERRORE DETTAGLIATO ===');
+        console.error('Messaggio:', error.message);
+        console.error('Codice:', error.code);
+        console.error('Stack:', error.stack);
+
         console.error('Errore:', error);
         res.status(500).json({
             success: false,
@@ -90,4 +101,4 @@ const readLog = (req, res) => {
     }
 }
 
-export {sendEmail, readLog};
+export { sendEmail, readLog };
