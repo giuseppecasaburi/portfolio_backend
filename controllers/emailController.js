@@ -6,17 +6,16 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const passResend = process.env.RESEND_API_KEY;
-const resend = new Resend("re_RTNGNP75_47rypHAFmdAkmNPidYcW1sH9");
 
 const sendEmail = async (req, res) => {
     const { name, surname, email, phoneNumber, message, policy } = req.body;
 
     try {
-        console.log('Tentativo invio email...');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        // console.log('Tentativo invio email...');
 
         const { data, error } = await resend.emails.send({
-            from: 'Portfolio <onboarding@resend.dev>', // usa questo per test, poi il tuo dominio
+            from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
             replyTo: email,
             subject: `Messaggio da ${name} ${surname ? surname : ''} - Portfolio`,
@@ -27,7 +26,7 @@ const sendEmail = async (req, res) => {
             throw new Error(error.message);
         }
 
-        console.log('Email inviata con successo! ID:', data.id);
+        // console.log('Email inviata con successo! ID:', data.id);
 
         // Salvataggio dati nel Log (identico a prima)
         const dataToSave = `\n===== Nuovo invio (${new Date().toLocaleString()}) =====
@@ -42,7 +41,7 @@ const sendEmail = async (req, res) => {
         const filePath = path.join(__dirname, 'contatti.txt');
         await fs.promises.appendFile(filePath, dataToSave);
 
-        console.log('Dati salvati con successo!');
+        // console.log('Dati salvati con successo!');
 
         res.json({
             success: true,
@@ -51,7 +50,7 @@ const sendEmail = async (req, res) => {
 
     } catch (error) {
 
-        console.error('Errore:', error);
+        // console.error('Errore:', error);
         res.status(500).json({
             success: false,
             type: "generic",

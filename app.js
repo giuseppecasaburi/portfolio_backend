@@ -1,13 +1,13 @@
+import configDotenv from "dotenv";
+configDotenv.config();
+
 import express from "express";
 import cors from "cors";
-import configDotenv from "dotenv";
 import validateEmailInput from "./middlewares/validateEmailInput.js";
 import {sendEmail, readLog } from "./controllers/emailController.js";
 
 const app = express();
 const port = 3000;
-
-configDotenv.config();
 
 app.use(express.json());
 app.use(cors());
